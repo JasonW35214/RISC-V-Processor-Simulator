@@ -358,6 +358,21 @@ if __name__ == "__main__":
 
         if ssCore.halted and fsCore.halted:
             break
+
+    # Measure and report average CPI, Total execution cycles, and Instructions per cycle for both these cores by adding performance monitors to your code.
+    print("====== Single Stage Core Performance Metrics ======")
+    print("Total execution cycles:", ssCore.cycle)
+    print("Total instructions executed:", ssCore.instruction_count)
+    print("Average CPI:", ssCore.cycle / ssCore.instruction_count)
+    print("Instructions per cycle:", ssCore.instruction_count / ssCore.cycle)
+    print("===================================================")
+    
+    # print("====== Five Stage Core Performance Metrics ======")
+    # print("Total execution cycles:", fsCore.cycle)
+    # print("Total instructions executed:", fsCore.instruction_count)
+    # print("Average CPI:", fsCore.cycle / fsCore.instruction_count)
+    # print("Instructions per cycle:", fsCore.instruction_count / fsCore.cycle)
+    # print("=================================================")
     
     # dump SS and FS data mem.
     dmem_ss.outputDataMem()
