@@ -35,12 +35,12 @@ class DataMem(object):
         # ReadAddress (int)
         # returns (str)
         
-        instruction = ""
+        mem_data = ""
         for i in range(4):
-            instruction += self.DMem[ReadAddress + i]
+            mem_data += self.DMem[ReadAddress + i]
         
-        #print("DataMem->readInstr->instruction:", instruction)
-        return instruction
+        #print("DataMem->readInstr->mem_data:", mem_data)
+        return mem_data
         
     def writeDataMem(self, Address, WriteData):
         # write data into byte addressable memory
@@ -129,9 +129,8 @@ class SingleStageCore(Core):
         instruction = self.ext_imem.readInstr(pc)
         self.state.ID["Instr"] = instruction
 
-        
-        self.instruction_count += 1
-        # print("Code.asm index:", (self.instruction_count - 1) * 4)
+        if self.state.IF["nop"] == False:
+            self.instruction_count += 1
 
         ############################## Instruction Decode (ID) #################################
         # convert the 32 bits into an instruction (Big Endian)
@@ -165,104 +164,110 @@ class SingleStageCore(Core):
         if isinstance(rs2_val, str):
             rs2_val = int(rs2_val, 2)
 
-        # R-type
-        if opcode == "0110011":
-            # ADD / SUB
-            if funct3 == "000": 
-                if funct7 == "0000000":
-                    alu_result = rs1_val + rs2_val
-                if funct7 == "0100000": 
-                    alu_result = rs1_val - rs2_val
-            # XOR
-            elif funct3 == "100":
-                alu_result = rs1_val ^ rs2_val
-            # OR
-            elif funct3 == "110":
-                alu_result = rs1_val | rs2_val
-            # AND
-            elif funct3 == "111":
-                alu_result = rs1_val & rs2_val
-
-        # I-type
-        elif opcode == "0010011":
-            # ADDI 
-            if funct3 == "000":
-                alu_result = rs1_val + imm_i
-            # XORI
-            if funct3 == "100":
-                alu_result = rs1_val ^ imm_i
-            # ORI
-            if funct3 == "110":
-                alu_result = rs1_val | imm_i
-            # ANDI
-            if funct3 == "111":
-                alu_result = rs1_val & imm_i
-
-        # Load
-        elif opcode == "0000011":
-            # LW
-            mem_address = rs1_val + imm_i
-            
-            # print("Load mem_address:", mem_address)
-
-        # Store
-        elif opcode == "0100011":
-            # SW
-            mem_address = rs1_val + imm_s
-            mem_data = rs2_val
-
-            # print("Store mem_address:", mem_address)
-            # print("Store mem_data:", mem_address)
-
-        # B-type
-        elif opcode == "1100011":
-            # BEQ
-            if funct3 == "000" and rs1_val == rs2_val: 
-                self.nextState.IF["PC"] = pc + imm_b
-                branch_taken = True
-            # BNE    
-            elif funct3 == "001" and rs1_val != rs2_val: 
-                self.nextState.IF["PC"] = pc + imm_b
-                branch_taken = True 
-
-        # J-type
-        elif opcode == "1101111":
-            branch_taken = True
-            # JAL
-            self.myRF.writeRF(rd, self.int_to_binary(pc + 4))  
-            self.nextState.IF["PC"] = pc + imm_j
-        
         # HALT
-        elif opcode == "1111111":
+        if opcode == "1111111":
             self.nextState.IF["nop"] = True
             self.nextState.IF["PC"] = 0
 
-        ################################# Memory Access (MEM) ##################################
-        # Load and Store instructions
-        # Load
-        if opcode == "0000011":
-            # LW
-            mem_data = int(self.ext_dmem.readInstr(mem_address), 2)
-
-        # Store
-        elif opcode == "0100011":
-            # SW
-            self.ext_dmem.writeDataMem(mem_address, self.int_to_binary(mem_data))
-
-        ################################### Write Back (WB) ####################################
-        # update the values of registers
-
-        # R-type and I-type
-        if opcode in ["0110011", "0010011"]:
-            self.myRF.writeRF(rd, self.int_to_binary(alu_result))
-        
-        # Load
-        elif opcode == "0000011":
-            self.myRF.writeRF(rd, self.int_to_binary(mem_data))
-
-        # Update PC if no branch/jump
-        if branch_taken == False:
-            self.nextState.IF["PC"] = pc + 4
+        else: 
+            # R-type
+            if opcode == "0110011":
+                # ADD / SUB
+                if funct3 == "000": 
+                    if funct7 == "0000000":
+                        alu_result = rs1_val + rs2_val
+                    if funct7 == "0100000": 
+                        alu_result = rs1_val - rs2_val
+                # XOR
+                elif funct3 == "100":
+                    alu_result = rs1_val ^ rs2_val
+                # OR
+                elif funct3 == "110":
+                    alu_result = rs1_val | rs2_val
+                # AND
+                elif funct3 == "111":
+                    alu_result = rs1_val & rs2_val
+    
+            # I-type
+            elif opcode == "0010011":
+                # ADDI 
+                if funct3 == "000":
+                    alu_result = rs1_val + imm_i
+                # XORI
+                if funct3 == "100":
+                    alu_result = rs1_val ^ imm_i
+                # ORI
+                if funct3 == "110":
+                    alu_result = rs1_val | imm_i
+                # ANDI
+                if funct3 == "111":
+                    alu_result = rs1_val & imm_i
+    
+            # Load
+            elif opcode == "0000011":
+                # LW
+                mem_address = rs1_val + imm_i
+                
+                # print("Load mem_address:", mem_address)
+    
+            # Store
+            elif opcode == "0100011":
+                # SW
+                mem_address = rs1_val + imm_s
+                mem_data = rs2_val
+    
+                # print("Store mem_address:", mem_address)
+                # print("Store mem_data:", mem_address)
+    
+            # B-type
+            elif opcode == "1100011":
+                # BEQ
+                if funct3 == "000" and rs1_val == rs2_val: 
+                    self.nextState.IF["PC"] = pc + imm_b
+                    branch_taken = True
+                # BNE    
+                elif funct3 == "001" and rs1_val != rs2_val: 
+                    self.nextState.IF["PC"] = pc + imm_b
+                    branch_taken = True 
+    
+            # J-type
+            elif opcode == "1101111":
+                branch_taken = True
+                # JAL
+                self.myRF.writeRF(rd, self.int_to_binary(pc + 4))  
+                self.nextState.IF["PC"] = pc + imm_j
+            
+            # # HALT
+            # elif opcode == "1111111":
+            #     self.nextState.IF["nop"] = True
+            #     self.nextState.IF["PC"] = 0
+    
+            ################################# Memory Access (MEM) ##################################
+            # Load and Store instructions
+            # Load
+            if opcode == "0000011":
+                # LW
+                mem_data = int(self.ext_dmem.readInstr(mem_address), 2)
+    
+            # Store
+            elif opcode == "0100011":
+                # SW
+                self.ext_dmem.writeDataMem(mem_address, self.int_to_binary(mem_data))
+    
+            ################################### Write Back (WB) ####################################
+            # update the values of registers
+    
+            # R-type and I-type
+            if opcode in ["0110011", "0010011"]:
+                self.myRF.writeRF(rd, self.int_to_binary(alu_result))
+            
+            # Load
+            elif opcode == "0000011":
+                self.myRF.writeRF(rd, self.int_to_binary(mem_data))
+    
+            # Update PC if no branch/jump
+            if branch_taken == False:
+                self.nextState.IF["PC"] = pc + 4
 
         # self.halted = True
         if self.state.IF["nop"]:
@@ -273,6 +278,7 @@ class SingleStageCore(Core):
             
         self.state = self.nextState #The end of the cycle and updates the current state with the values calculated in this cycle
         self.cycle += 1
+        self.nextState = State()
 
     def printState(self, state, cycle):
         printstate = ["-"*70+"\n", "State after executing cycle: " + str(cycle) + "\n"]
