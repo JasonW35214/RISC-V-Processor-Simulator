@@ -379,6 +379,20 @@ if __name__ == "__main__":
     # print("Average CPI:", fsCore.cycle / fsCore.instruction_count)
     # print("Instructions per cycle:", fsCore.instruction_count / fsCore.cycle)
     # print("=================================================")
+
+    # Print Metrics to PerformanceMetrics.txt
+    with open("PerformanceMetrics.txt", "w") as f:
+        print("Performance of Single Stage:", file=f)
+        print("#Cycles ->", ssCore.cycle, file=f)
+        print("#Instructions ->", ssCore.instruction_count, file=f)
+        print("CPI ->", ssCore.cycle / ssCore.instruction_count, file=f)
+        print("IPC ->", ssCore.instruction_count / ssCore.cycle, file=f)
+        # print(file=f)
+        # print("Performance of Five Stage:", file=f)
+        # print("#Cycles ->", fsCore.cycle, file=f)
+        # print("#Instructions ->", fsCore.instruction_count, file=f)
+        # print("CPI ->", fsCore.cycle / fsCore.instruction_count, file=f)
+        # print("IPC ->", fsCore.instruction_count / fsCore.cycle, file=f)
     
     # dump SS and FS data mem.
     dmem_ss.outputDataMem()
