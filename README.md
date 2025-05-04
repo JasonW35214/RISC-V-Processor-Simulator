@@ -75,7 +75,7 @@ Each stage is separated by flip-flops and has a `nop` bit to indicate inactivity
 
 ## 🗂️ Skeleton Code
 
-The `skeleton_code/` directory contains starter code for both Python (`NYU_RV32I_6913.py`) and C++ (`NYU_RV32I_6913.cpp`). These files provide a baseline implementation framework that you can extend to build the RISC-V processor simulator.
+The `base/` directory contains starter code for both Python (`NYU_RV32I_6913.py`) and C++ (`NYU_RV32I_6913.cpp`). These files provide a baseline implementation framework that you can extend to build the RISC-V processor simulator.
 
 ## 📚 References
 
