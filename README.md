@@ -59,14 +59,14 @@ Each stage is separated by flip-flops and has a `nop` bit to indicate inactivity
 
 ## ✅ Tasks
 
-1. Implement a single-stage RISC-V processor and run the simulation.  
-2. Implement a five-stage pipelined processor with support for stalling and forwarding.  
-3. Collect and report:
+1. (Phase 1) Implement a single-stage RISC-V processor and run the simulation.  
+2. (Phase 2) Implement a five-stage pipelined processor with support for stalling and forwarding.  
+3. (Phase 1 & 2) Collect and report:
    - Average **CPI**
    - Total **Execution Cycles**
    - **Instructions Per Cycle (IPC)**
-4. Compare performance of both implementations and analyze results.  
-5. _(Optional)_ Suggest or implement performance improvements for extra credit.
+4. (Phase 2) Compare performance of both implementations and analyze results.  
+5. (Phase 2) Suggest or implement performance improvements for extra credit.
 
 ## 🧪 Testing
 
